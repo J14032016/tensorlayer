@@ -551,32 +551,32 @@ workflows:
           type: approval
           filters:
             tags:
-              only: /\d+\.\d+(\.\d+)?(\S*)?$/
+              only: /.*/
 
       - build_pypi_py2_cpu:
           requires:
             - hold
           filters:
             tags:
-              only: /\d+\.\d+(\.\d+)?(\S*)?$/
+              only: /.*/
 
       - build_pypi_py2_gpu:
           requires:
             - hold
           filters:
             tags:
-              only: /\d+\.\d+(\.\d+)?(\S*)?$/
+              only: /.*/
 
       - build_pypi_py3_cpu:
           requires:
             - hold
           filters:
             tags:
-              only: /\d+\.\d+(\.\d+)?(\S
-
+              only: /.*/
+              
       - build_pypi_py3_gpu:
           requires:
             - hold
           filters:
             tags:
-              only: /\d+\.\d+(\.\d+)?(\S*)?$/
+              only: /.*/
