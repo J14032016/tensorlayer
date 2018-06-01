@@ -551,9 +551,9 @@ workflows:
           type: approval
           filters:
             tags:
-              only: /.*/
+              only: /\d+\.\d+(\.\d+)?(\S*)?$/
             branches:
-              only: /.*/
+              only: /\d+\.\d+(\.\d+)?(\S*)?$/
 
       - build_pypi_py2_cpu:
           requires:
