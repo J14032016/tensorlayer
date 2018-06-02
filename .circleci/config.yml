@@ -66,11 +66,11 @@ workflows:
   continuous-delivery-workflow:
     jobs:
       - install_dependencies:
-        filters:
-          tags:
-            only: /.*/
-          branches:
-            only: /.*/
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
 
       - staging:
           requires:
