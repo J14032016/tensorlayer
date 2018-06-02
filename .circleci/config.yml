@@ -19,6 +19,21 @@ jobs:
             apk add --update py-pip
             python -m pip install --upgrade pip
 
+  deploy_install:
+    working_directory: ~/build
+    docker:
+      - image: docker:git
+    steps:
+      - checkout
+      - setup_remote_docker:
+          reusable: true
+          exclusive: true
+
+      - run:
+          name: RELEASE BUILD
+          command: |
+            apk add --update py-pip
+
   my_dummy_job_deploy:
     working_directory: ~/build
     docker:
@@ -32,8 +47,6 @@ jobs:
       - run:
           name: RELEASE BUILD
           command: |
-
-            apk add --update py-pip
             python -m pip install --upgrade pip
 
 ###################################################################################
@@ -61,14 +74,18 @@ workflows:
       #                                   TAGS BUILDS                                   #
       ###################################################################################
 
+      - deploy_install:
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              ignore: /.*/
+
       - hold:
           type: approval
+          requires:
+            - deploy_install
 
       - my_dummy_job_deploy:
           requires:
             - hold
-          filters:
-            tags:
-              only: /\d+(\.\d+)?(\S*)/
-            branches:
-              ignore: /.*/
