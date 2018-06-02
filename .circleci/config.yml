@@ -58,7 +58,7 @@ jobs:
       - run:
           name: TEST - production
           command: |
-            ls -la workspace/
+            ls -la workspace
 
 workflows:
   version: 2
