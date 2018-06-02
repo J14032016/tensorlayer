@@ -61,9 +61,14 @@ workflows:
       #                                   TAGS BUILDS                                   #
       ###################################################################################
 
-      - my_dummy_job_deploy:
+      - hold:
+          type: approval
           filters:
             tags:
               only: /\d+(\.\d+)?(\S*)/
             branches:
               ignore: /.*/
+
+      - my_dummy_job_deploy:
+          requires:
+            - hold
