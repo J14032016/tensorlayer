@@ -63,12 +63,12 @@ workflows:
 
       - hold:
           type: approval
+
+      - my_dummy_job_deploy:
+          requires:
+            - hold
           filters:
             tags:
               only: /\d+(\.\d+)?(\S*)/
             branches:
               ignore: /.*/
-
-      - my_dummy_job_deploy:
-          requires:
-            - hold
