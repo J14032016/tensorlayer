@@ -65,17 +65,18 @@ workflows:
 
   continuous-delivery-workflow:
     jobs:
-      - install_dependencies:
+
+      - approve-production:
+          type: approval
           filters:
             tags:
               only: /.*/
             branches:
               ignore: /.*/
 
-      - approve-production:
-          type: approval
+      - install_dependencies:
           requires:
-            - install_dependencies
+            - approve-production
           filters:
             tags:
               only: /.*/
@@ -84,7 +85,7 @@ workflows:
 
       - production:
           requires:
-            - approve-production
+            - install_dependencies
           filters:
             tags:
               only: /.*/
