@@ -36,7 +36,6 @@ jobs:
       - run:
           name: TEST - staging
           command: |
-            pip install --upgrade lazy
             ls -la workspace/
       
   staging-e2e:
@@ -48,7 +47,6 @@ jobs:
       - run:
           name: TEST - staging-e2e
           command: |
-            pip install --upgrade pyminifier
             ls -la workspace/
       
   production:
@@ -60,7 +58,6 @@ jobs:
       - run:
           name: TEST - production
           command: |
-            pip install --upgrade geopytool
             ls -la workspace/
 
 workflows:
