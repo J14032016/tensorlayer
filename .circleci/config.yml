@@ -1,91 +1,100 @@
+defaults: &defaults
+  working_directory: ~/build
+  docker:
+    - image: docker:git
+    
 version: 2
-
 jobs:
-
-  my_dummy_job_nightly:
-    working_directory: ~/build
-    docker:
-      - image: docker:git
+  install_dependencies:
+    <<: *defaults
     steps:
+
       - checkout
+
       - setup_remote_docker:
           reusable: true
           exclusive: true
 
       - run:
-          name: NIGHTLY BUILD
-          command: |
-
-            apk add --update py-pip
-            python -m pip install --upgrade pip
-
-  deploy_install:
-    working_directory: ~/build
-    docker:
-      - image: docker:git
-    steps:
-      - checkout
-      - setup_remote_docker:
-          reusable: true
-          exclusive: true
-
-      - run:
-          name: RELEASE BUILD
+          name: INSTALL DEPENDENCIES
           command: |
             apk add --update py-pip
-
-  my_dummy_job_deploy:
-    working_directory: ~/build
-    docker:
-      - image: docker:git
-    steps:
-      - checkout
-      - setup_remote_docker:
-          reusable: true
-          exclusive: true
-
-      - run:
-          name: RELEASE BUILD
-          command: |
             python -m pip install --upgrade pip
-
-###################################################################################
-#                               CircleCI WORKFLOWS                                #
-###################################################################################
+            pip install --upgrade requests
+          
+      - persist_to_workspace:
+          root: ~/build
+          paths:
+            - .
+ 
+  staging:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: workspace/
+          
+      - run:
+          name: TEST - staging
+          command: |
+            pip install --upgrade lazy
+            ls -la workspace/
+      
+  staging-e2e:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: workspace/
+          
+      - run:
+          name: TEST - staging-e2e
+          command: |
+            pip install --upgrade pyminifier
+            ls -la workspace/
+      
+  production:
+    <<: *defaults
+    steps:
+      - attach_workspace:
+          at: workspace/
+          
+      - run:
+          name: TEST - production
+          command: |
+            pip install --upgrade geopytool
+            ls -la workspace/
 
 workflows:
   version: 2
-  build-and-deploy:
+
+  continuous-delivery-workflow:
     jobs:
+      - install_dependencies
 
-      ###################################################################################
-      #                                  NIGHTLY BUILDS                                 #
-      ###################################################################################
-
-      - my_dummy_job_nightly:
+      - staging:
+          requires:
+            - build
           filters:
-            tags:
-              ignore: /.*/
             branches:
               only: /.*/
 
-
-      ###################################################################################
-      #                                   TAGS BUILDS                                   #
-      ###################################################################################
-
-      - deploy_install:
+      - staging-e2e:
+          requires:
+            - staging
           filters:
-            tags:
-              only: /.*/
             branches:
-              ignore: /.*/
+              only: /.*/
 
-      - hold:
+      - approve-production:
           type: approval
           requires:
-            - deploy_install
+            - staging-e2e
+          filters:
+            branches:
+              only: /.*/
 
-      - my_dummy_job_deploy:
+      - production:
           requires:
-            - hold
+            - approve-production
+          filters:
+            branches:
+              only: /.*/
