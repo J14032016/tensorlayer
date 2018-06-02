@@ -75,16 +75,36 @@ workflows:
       - staging:
           requires:
             - install_dependencies
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
 
       - staging-e2e:
           requires:
             - staging
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
 
       - approve-production:
           type: approval
           requires:
             - staging-e2e
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
 
       - production:
           requires:
             - approve-production
+          filters:
+            tags:
+              only: /.*/
+            branches:
+              only: /.*/
